@@ -1,26 +1,41 @@
-<!DOCTYPE html>
+
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Fill in the Blanks</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="utf-8" />
+  <title>Daily Fill-in Challenge</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  style.css
 </head>
 <body>
   <div class="container">
     <h1>Fill in the Blanks</h1>
-    <div id="question"></div>
-    <div id="options"></div>
-    <div id="feedback"></div>
-    <button id="next">Enter ID number to get reward!</button>
 
-    <div id="submission" style="display: none; margin-top: 20px;">
-      <input type="text" id="idNumber" placeholder="請輸入您的員工號" />
-      <input type="text" id="wordOfDay" placeholder="今天學到的單字是?" />
+    <!-- 題目／答案圖片區 -->
+    <div id="question">
+      <img id="qImg" alt="Question" style="max-width:100%;border-radius:12px;" />
+      <img id="aImg" alt="Answer" style="max-width:100%;border-radius:12px;display:none;" />
+    </div>
+
+    <!-- 題目選項 -->
+    <div id="options"></div>
+
+    <!-- 答題回饋 -->
+    <div id="feedback"></div>
+
+    <!-- 下一步（顯示提交表單） -->
+    <button id="next">Next</button>
+
+    <!-- 提交員工ID與每日單字 -->
+    <div id="submission" style="display:none;">
+      <p>Enter ID number to get reward!</p>
+      <input id="idNumber" type="text" placeholder="Employee ID" />
+      <input id="wordOfDay" type="text" placeholder="Word of the day" />
       <button id="submit">Submit</button>
       <div id="submitFeedback"></div>
     </div>
   </div>
-  <script src="script.js"></script>
-  
+
+  script.js</script>
 </body>
 </html>
