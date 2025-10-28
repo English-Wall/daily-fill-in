@@ -1,157 +1,154 @@
-// 台北時區 → 產生 YYYY-MM-DD
-const TIME_ZONE = 'Asia/Taipei';
-function getDateStr() {
-  const urlDate = new URLSearchParams(window.location.search).get('date');
-  if (urlDate && /^\d{4}-\d{2}-\d{2}$/.test(urlDate)) return urlDate;
-  const now = new Date();
+/**
+ * 獲取台北時區的當前日期字串 (YYYY-MM-DD)
+ */
+function getTaipeiDateString() {
+  // 使用 Intl.DateTimeFormat 'en-CA' (加拿大) 格式來獲取 YYYY-MM-DD 格式
   const formatter = new Intl.DateTimeFormat('en-CA', {
-    timeZone: TIME_ZONE, year: 'numeric', month: '2-digit', day: '2-digit'
+    timeZone: 'Asia/Taipei',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
   });
-  return formatter.format(now); // 例如 2025-10-28
+  return formatter.format(new Date()); // 返回 "YYYY-MM-DD"
 }
 
-// 你的 User Pages 根目錄下的每日資料夾
-const BASE_PATH = '/daily-fill-in/daily';
-
-let questionData = null;
-let questionImgUrl = '';
-let answerImgUrl = '';
-
+/**
+ * 禁用所有選項按鈕
+ */
 function disableOptions() {
-  document.querySelectorAll('.option-btn').forEach(btn => { btn.disabled = true; });
+  document.querySelectorAll('.option-btn').forEach(btn => {
+    btn.disabled = true;
+  });
 }
 
-function clearUI() {
+/**
+ * 異步加載當天的題目
+ */
+async function loadQuestion() {
   const nextButton = document.getElementById("next");
+  const questionDiv = document.getElementById("question");
+  const optionsDiv = document.getElementById("options");
+  const feedbackDiv = document.getElementById("feedback");
+
+  // 1. 初始化UI
   nextButton.disabled = true;
   nextButton.style.display = "none";
-  document.getElementById("feedback").textContent = "";
-  document.getElementById("options").innerHTML = "";
-  document.getElementById("answer").style.display = "none";
-  document.getElementById("submission").style.display = "none";
-  const qImg = document.getElementById("questionImage");
-  qImg.style.display = "none"; qImg.removeAttribute('src');
-  const aImg = document.getElementById("answerImage");
-  aImg.removeAttribute('src');
-}
+  feedbackDiv.textContent = "";
+  optionsDiv.innerHTML = ""; // 清空舊選項
+  questionDiv.innerHTML = "<p>Loading today's question...</p>"; // 提示加載中
 
-async function fetchDaily(dateStr) {
-  const folder = `${BASE_PATH}/${dateStr}`;
-
-  // 用絕對路徑（同源）
-  const metaUrl = `${folder}/meta.json`;
-  const qUrl    = `${folder}/question.png?v=${dateStr}`;
-  const aUrl    = `${folder}/answer.png?v=${dateStr}`;
-
-  // 讓你在畫面上看到實際嘗試的 URL
-  document.getElementById('dateInfo').innerHTML =
-    `題目日期：${dateStr}（台北時區）｜嘗試載入：${metaUrl}${metaUrl}</a>`;
-
-  const metaResp = await fetch(metaUrl, { cache: 'no-cache' });
-  if (!metaResp.ok) throw new Error(`找不到 meta.json（HTTP ${metaResp.status}）@ ${metaUrl}`);
-
-  // 允許 {options, correct} 與 {question:{...}} 兩種結構
-  const metaRaw = await metaResp.json();
-  const meta = metaRaw.question ?? metaRaw;
-  if (!meta || !Array.isArray(meta.options) || typeof meta.correct !== 'string') {
-    throw new Error('meta.json 結構不完整，需要 { options: [...], correct: "..." } 或 { question: {...} }');
-  }
-
-  questionData   = meta;
-  questionImgUrl = qUrl;
-  answerImgUrl   = aUrl;
-
-  if (typeof meta.word === 'string' && meta.word.trim()) {
-    document.getElementById("wordOfDay").value = meta.word.trim();
-  }
-  const title = typeof meta.title === 'string' ? meta.title : 'Daily Fill in the Blanks';
-  document.getElementById('dateInfo').innerHTML += `｜${title}`;
-}
-
-function renderQuestionImage() {
-  const img = document.getElementById("questionImage");
-  img.src = questionImgUrl;
-  img.style.display = "block";
-}
-
-function renderOptions() {
-  const optionsDiv = document.getElementById("options");
-  const nextButton = document.getElementById("next");
-  optionsDiv.innerHTML = "";
-
-  questionData.options.forEach((option, index) => {
-    const btn = document.createElement("button");
-    btn.textContent = option;
-    btn.className = `option-btn option-btn-${index + 1}`;
-    btn.onclick = () => {
-      if (option === questionData.correct) {
-        btn.classList.add("correct");
-        document.getElementById("feedback").textContent = "✅ Correct!";
-        disableOptions();
-        nextButton.disabled = false;
-        nextButton.style.display = "block";
-        document.getElementById("answerImage").src = answerImgUrl;
-        document.getElementById("answer").style.display = "block";
-      } else {
-        btn.classList.add("incorrect");
-        document.getElementById("feedback").textContent = "❌ Wrong. Try again.";
-        btn.disabled = true;
-      }
-    };
-    optionsDiv.appendChild(btn);
-  });
-}
-
-function initNextButton() {
-  document.getElementById("next").onclick = () => {
-    document.getElementById("submission").style.display = "block";
-  };
-}
-
-function initSubmission() {
-  document.getElementById("submit").onclick = () => {
-    const id = document.getElementById("idNumber").value.trim();
-    const word = document.getElementById("wordOfDay").value.trim();
-    const status = document.getElementById("submitFeedback");
-    if (!/^\d+$/.test(id)) { status.textContent = "❗ 請輸入正確的數字員工號"; return; }
-    if (!/^[a-zA-Z]+$/.test(word)) { status.textContent = "❗ 請輸入正確的英文單字"; return; }
-
-    status.textContent = "⏳ Submitting...";
-    const submitBtn = document.getElementById("submit");
-    submitBtn.disabled = true;
-
-    fetch("https://script.google.com/macros/s/AKfycbxN_QRhW6F7ogSh_twhLlfMZNbSyGlzip3AmhiWHt1wJ0It4fReU53RJ5Ub5w_nWTLE/exec", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `id=${encodeURIComponent(id)}&word=${encodeURIComponent(word)}`
-    })
-    .then(r => r.json())
-    .then(data => {
-      status.textContent = data.message;
-      submitBtn.disabled = data.status === 'success';
-    })
-    .catch(err => {
-      console.error("Submission error:", err);
-      status.textContent = "❌ Submission failed. Check console for details.";
-      submitBtn.disabled = false;
-    });
-  };
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-  clearUI();
-  initNextButton();
-  initSubmission();
-  const dateStr = getDateStr();
+  let dateString;
   try {
-    await fetchDaily(dateStr);
-    renderQuestionImage();
-    renderOptions();
-  } catch (err) {
-    console.error(err);
-    document.getElementById('dateInfo').innerHTML =
-      `題目日期：${dateStr}（台北時區）｜今日資料尚未上架或路徑錯誤`;
-    document.getElementById("feedback").textContent =
-      "⚠️ 無法載入今日題目，請確認 meta.json 是否已發佈且語法正確。";
+    dateString = getTaipeiDateString(); // e.g., "2025-10-28"
+  } catch (e) {
+    console.error("Error getting Taipei date:", e);
+    questionDiv.innerHTML = "<p style='color: red;'>Error getting current date.</p>";
+    return;
   }
-});
+
+  // 2. 定義今天題目的資源路徑
+  const questionJsonPath = `${dateString}/question.json`;
+  const questionImgPath = `${dateString}/question.png`;
+  const answerImgPath = `${dateString}/answer.png`;
+
+  try {
+    // 3. 獲取 question.json
+    const response = await fetch(questionJsonPath);
+    if (!response.ok) {
+      // 如果 fetch 失敗 (例如 404 Not Found)
+      throw new Error(`Cannot find question file: ${response.statusText}`);
+    }
+    const question = await response.json(); // 解析 JSON
+
+    // 4. 載入問題圖片
+    questionDiv.innerHTML = `
+      <img src="${questionImgPath}" alt="Question Image" style="max-width: 100%; height: auto;">
+    `;
+
+    // 5. 渲染選項按鈕
+    question.options.forEach((option, index) => {
+      const btn = document.createElement("button");
+      btn.textContent = option;
+      btn.className = `option-btn option-btn-${index + 1}`;
+      
+      btn.onclick = () => {
+        if (option === question.correct) {
+          // 答對
+          btn.classList.add("correct");
+          feedbackDiv.textContent = "✅ Correct!";
+          disableOptions();
+          nextButton.disabled = false;
+          nextButton.style.display = "block";
+          // 顯示答案圖片
+          questionDiv.innerHTML = `
+            <img src="${answerImgPath}" alt="Answer Image" style="max-width: 100%; height: auto;">
+          `;
+        } else {
+          // 答錯
+          btn.classList.add("incorrect");
+          feedbackDiv.textContent = "❌ Wrong. Try again.";
+          btn.disabled = true; // 禁用錯誤的選項
+        }
+      };
+      optionsDiv.appendChild(btn);
+    });
+
+  } catch (error) {
+    // 6. 處理加載錯誤
+    console.error("Error loading question:", error);
+    questionDiv.innerHTML = `<p style="color: red; font-weight: bold;">今日題目載入失敗或尚無題目。</p><p>(${dateString})</p>`;
+    optionsDiv.innerHTML = "";
+  }
+}
+
+// --- 提交邏輯 (保持不變) ---
+
+document.getElementById("next").onclick = () => {
+  document.getElementById("submission").style.display = "block";
+};
+
+document.getElementById("submit").onclick = () => {
+  const id = document.getElementById("idNumber").value.trim();
+  const word = document.getElementById("wordOfDay").value.trim();
+  const status = document.getElementById("submitFeedback");
+
+  // 驗證 ID 是否為數字
+  if (!/^\d+$/.test(id)) {
+    status.textContent = "❗ 請輸入正確的數字員工號";
+    return;
+  }
+
+  // 驗證 word 是否為英文字母
+  if (!/^[a-zA-Z]+$/.test(word)) {
+    status.textContent = "❗ 請輸入正確的英文單字";
+    return;
+  }
+
+ status.textContent = "⏳Submitting...";
+  document.getElementById("submit").disabled = true; // 先禁用按鈕防止重複提交
+
+  fetch("https://script.google.com/macros/s/AKfycbxN_QRhW6F7ogSh_twhLlfMZNbSyGlzip3AmhiWHt1wJ0It4fReU53RJ5Ub5w_nWTLE/exec", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: `id=${encodeURIComponent(id)}&word=${encodeURIComponent(word)}`
+  })
+  .then(response => response.json()) // 解析從 Apps Script 回傳的 JSON
+  .then(data => {
+    status.textContent = data.message; // 顯示從後端傳來的訊息
+    if (data.status === 'success') {
+      document.getElementById("submit").disabled = true; // 成功後保持禁用
+    } else {
+      document.getElementById("submit").disabled = false; // 失敗後重新啟用按鈕
+    }
+  })
+  .catch((error) => {
+    console.error("Submission error:", error);
+    status.textContent = "❌ Submission failed. Check console for details.";
+    document.getElementById("submit").disabled = false; // 發生錯誤時也重新啟用按鈕
+  });
+};
+
+// --- 頁面載入時執行 ---
+loadQuestion();
