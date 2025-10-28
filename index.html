@@ -1,44 +1,26 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="UTF-8" />
   <title>Fill in the Blanks</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
     <h1>Fill in the Blanks</h1>
-    <div id="dateInfo" style="margin: 0.5rem 0 1rem;"></div>
-
-    <!-- 題目區：每日 question.png -->
-    <div id="question">
-      <img id="questionImage" alt="Question Image" style="display:none;" />
-    </div>
-
-    <!-- 選項按鈕 -->
+    <div id="question"></div>
     <div id="options"></div>
-
-    <!-- 是否答對的回饋 -->
     <div id="feedback"></div>
-
-    <!-- 顯示答案圖 -->
-    <div id="answer" style="display:none; margin-top: 12px;">
-      <img id="answerImage" alt="Answer Image" />
-    </div>
-
-    <!-- 下一步：顯示送出表單 -->
     <button id="next">Enter ID number to get reward!</button>
 
-    <!-- 送出作答（保留你的既有 Google Apps Script 串接） -->
-    <div id="submission" style="display:none; margin-top: 20px;">
-      <input id="idNumber" type="text" inputmode="numeric" placeholder="您的員工號（數字）" />
-      <input id="wordOfDay" type="text" placeholder="今日單字（英文）" />
+    <div id="submission" style="display: none; margin-top: 20px;">
+      <input type="text" id="idNumber" placeholder="請輸入您的員工號" />
+      <input type="text" id="wordOfDay" placeholder="今天學到的單字是?" />
       <button id="submit">Submit</button>
       <div id="submitFeedback"></div>
     </div>
   </div>
-
- <script src="script.js"></script>
+  <script src="script.js"></script>
+  
 </body>
 </html>
