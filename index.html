@@ -1,43 +1,44 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="zh-Hant">
 <head>
   <meta charset="utf-8" />
-  <title>Daily Fill-in Challenge</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- 你的樣式 -->
-  style.css
+  <title>Fill in the Blanks</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
     <h1>Fill in the Blanks</h1>
+    <div id="dateInfo" style="margin: 0.5rem 0 1rem;"></div>
 
-    <!-- 題目 / 答案圖片（script.js 會依日期載入） -->
+    <!-- 題目區：每日 question.png -->
     <div id="question">
-      <img id="qImg" alt="Question" />
-      <img id="aImg" alt="Answer" style="display:none;" />
+      <img id="questionImage" alt="Question Image" style="display:none;" />
     </div>
 
-    <!-- 四個選項 -->
+    <!-- 選項按鈕 -->
     <div id="options"></div>
 
-    <!-- 回饋訊息 -->
+    <!-- 是否答對的回饋 -->
     <div id="feedback"></div>
 
-    <!-- 答對後顯示 -->
-    <button id="next">Next</button>
+    <!-- 顯示答案圖 -->
+    <div id="answer" style="display:none; margin-top: 12px;">
+      <img id="answerImage" alt="Answer Image" />
+    </div>
 
-    <!-- 送出資料 -->
-    <div id="submission" style="display:none;">
-      <p>Enter ID number to get reward!</p>
-      <input id="idNumber" type="text" placeholder="Employee ID" />
-      <input id="wordOfDay" type="text" placeholder="Word of the day" />
+    <!-- 下一步：顯示送出表單 -->
+    <button id="next">Enter ID number to get reward!</button>
+
+    <!-- 送出作答（保留你的既有 Google Apps Script 串接） -->
+    <div id="submission" style="display:none; margin-top: 20px;">
+      <input id="idNumber" type="text" inputmode="numeric" placeholder="您的員工號（數字）" />
+      <input id="wordOfDay" type="text" placeholder="今日單字（英文）" />
       <button id="submit">Submit</button>
       <div id="submitFeedback"></div>
     </div>
   </div>
 
-  <!-- 你的邏輯（上一則我給你的修正版 script.js） -->
-  script.js</script>
+ <script src="script.js"></script>
 </body>
 </html>
-``
