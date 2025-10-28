@@ -1,33 +1,48 @@
-
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>Daily Fill-in Challenge</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- 如果有 style.css，取消下行註解 -->
   style.css
+  <style>
+    /* 簡單保底樣式（若沒有 style.css 也能用） */
+    :root { --text:#333; --ok:#4CAF50; --ng:#F44336; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans", Arial, "Apple Color Emoji", "Segoe UI Emoji"; margin:0; padding:40px 16px; color:var(--text); display:flex; justify-content:center; }
+    .container{ width:100%; max-width:560px; text-align:center; }
+    #options{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:16px 0; }
+    .option-btn{ flex:0 0 calc(50% - 10px); padding:12px; border-radius:12px; border:none; font-size:1.2rem; cursor:pointer; }
+    .option-btn.correct{ background:var(--ok); color:#fff; }
+    .option-btn.incorrect{ background:var(--ng); color:#fff; }
+    #next{ padding:10px 20px; border:none; border-radius:12px; background:#333; color:#fff; cursor:pointer; display:none; }
+    #submission{ display:none; margin-top:16px; }
+    #submission input{ padding:10px; border:1px solid #ccc; border-radius:8px; width:100%; max-width:360px; margin:6px auto; display:block; }
+    #submit{ padding:10px 20px; border:none; border-radius:12px; background:#4CAF50; color:#fff; cursor:pointer; }
+    img{ max-width:100%; border-radius:12px; }
+  </style>
 </head>
 <body>
   <div class="container">
     <h1>Fill in the Blanks</h1>
 
-    <!-- 題目／答案圖片區 -->
+    <!-- 題目 / 答案圖片 -->
     <div id="question">
-      <img id="qImg" alt="Question" style="max-width:100%;border-radius:12px;" />
-      <img id="aImg" alt="Answer" style="max-width:100%;border-radius:12px;display:none;" />
+      <img id="qImg" alt="Question" />
+      <img id="aImg" alt="Answer" style="display:none;" />
     </div>
 
-    <!-- 題目選項 -->
+    <!-- 四個選項 -->
     <div id="options"></div>
 
-    <!-- 答題回饋 -->
+    <!-- 回饋訊息 -->
     <div id="feedback"></div>
 
-    <!-- 下一步（顯示提交表單） -->
+    <!-- 答對後的下一步 -->
     <button id="next">Next</button>
 
-    <!-- 提交員工ID與每日單字 -->
-    <div id="submission" style="display:none;">
+    <!-- 送出資料 -->
+    <div id="submission">
       <p>Enter ID number to get reward!</p>
       <input id="idNumber" type="text" placeholder="Employee ID" />
       <input id="wordOfDay" type="text" placeholder="Word of the day" />
@@ -39,3 +54,4 @@
   script.js</script>
 </body>
 </html>
+``
