@@ -1,0 +1,4 @@
+{
+  "correct": "total",
+  "options": ["total", "full", "whole", "sum"]
+}
