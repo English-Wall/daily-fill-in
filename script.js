@@ -1,6 +1,23 @@
-/**
- * 獲取台北時區的當前日期字串 (YYYY-MM-DD)
- */
+
+const QUESTIONS = {
+   "2025-10-28": {
+     questionImg: "assets/2025-10-31/question.png",
+     answerImg:   "assets/2025-10-31/answer.png",
+     options: ["A. tire", "B. wheel", "C. brake", "D. landing gear"],
+     correct: "D. landing gear"
+   },
+  "2025-10-29": {
+    questionImg: "assets/2025-11-01/question.png",
+    answerImg:   "assets/2025-11-01/answer.png",
+    options: ["A. fuselage", "B. wing", "C. flap", "D. rudder"],
+    correct: "C. flap"
+  },
+};
+
+
+
+* 獲取台北時區的當前日期字串 (YYYY-MM-DD)
+
 function getTaipeiDateString() {
   // 使用 Intl.DateTimeFormat 'en-CA' (加拿大) 格式來獲取 YYYY-MM-DD 格式
   const formatter = new Intl.DateTimeFormat('en-CA', {
@@ -46,60 +63,42 @@ async function loadQuestion() {
     return;
   }
 
-  // 2. 定義今天題目的資源路徑
-  const questionJsonPath = `${dateString}/question.json`;
-  const questionImgPath = `${dateString}/question.png`;
-  const answerImgPath = `${dateString}/answer.png`;
-
-  try {
-    // 3. 獲取 question.json
-    const response = await fetch(questionJsonPath);
-    if (!response.ok) {
-      // 如果 fetch 失敗 (例如 404 Not Found)
-      throw new Error(`Cannot find question file: ${response.statusText}`);
-    }
-    const question = await response.json(); // 解析 JSON
-
-    // 4. 載入問題圖片
+  const question = QUESTIONS[dateString];
+  if (!question) {
     questionDiv.innerHTML = `
-      <img src="${questionImgPath}" alt="Question Image" style="max-width: 100%; height: auto;">
-    `;
-
-    // 5. 渲染選項按鈕
-    question.options.forEach((option, index) => {
-      const btn = document.createElement("button");
-      btn.textContent = option;
-      btn.className = `option-btn option-btn-${index + 1}`;
-      
-      btn.onclick = () => {
-        if (option === question.correct) {
-          // 答對
-          btn.classList.add("correct");
-          feedbackDiv.textContent = "✅ Correct!";
-          disableOptions();
-          nextButton.disabled = false;
-          nextButton.style.display = "block";
-          // 顯示答案圖片
-          questionDiv.innerHTML = `
-            <img src="${answerImgPath}" alt="Answer Image" style="max-width: 100%; height: auto;">
-          `;
-        } else {
-          // 答錯
-          btn.classList.add("incorrect");
-          feedbackDiv.textContent = "❌ Wrong. Try again.";
-          btn.disabled = true; // 禁用錯誤的選項
-        }
-      };
-      optionsDiv.appendChild(btn);
-    });
-
-  } catch (error) {
-    // 6. 處理加載錯誤
-    console.error("Error loading question:", error);
-    questionDiv.innerHTML = `<p style="color: red; font-weight: bold;">今日題目載入失敗或尚無題目。</p><p>(${dateString})</p>`;
+      <div style="padding:8px 0;">
+        <p>今日題目載入失敗或尚無題目。</p>
+        <p>(${dateString})</p>
+      </div>`;
     optionsDiv.innerHTML = "";
+    return;
   }
-}
+  // 顯示題幹圖片（從題庫物件的路徑）
+  questionDiv.innerHTML = `
+    <img src="${question.questionImg}" alt="Question Image" />
+s.forEach((option, index) => {
+    const btn = document.createElement("button");
+    btn.textContent = option;
+    btn.className = `option-btn option-btn-${index + 1}`;
+    btn.onclick = () => {
+      if (option === question.correct) {
+        btn.classList.add("correct");
+        feedbackDiv.textContent = "✅ Correct!";
+        disableOptions();
+        nextButton.disabled = false;
+        nextButton.style.display = "block";
+        // 顯示答案圖片
+        questionDiv.innerHTML = `
+          <img src="${question.answerImg}" alt="Answer Image+        btn.classList.add("incorrect");
+        feedbackDiv.textContent = "❌ Wrong. Try again.";
+        btn.disabled = true;
+      }
+    };
+    optionsDiv.appendChild(btn);
+  });
+
+
+  
 
 // --- 提交邏輯 (保持不變) ---
 
